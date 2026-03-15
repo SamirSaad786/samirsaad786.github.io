@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samir Saad — Interactive Work</title>
+<meta name="description" content="HR practitioner and indie developer. Interactive tools for organizational behavior. Browser games about systems, signals, and the spaces between.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Serif+JP:wght@300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+:root {
+  --mono:      'DM Mono', monospace;
+  --serif-en:  'Cormorant Garamond', Georgia, serif;
+  --serif-jp:  'Noto Serif JP', serif;
+
+  /* HR — warm paper */
+  --hr-bg:     #f4efe4;
+  --hr-bg2:    #ebe5d6;
+  --hr-bg3:    #dfd8c8;
+  --hr-ink:    #1c1a16;
+  --hr-rule:   rgba(28,26,22,0.10);
+  --hr-rule2:  rgba(28,26,22,0.22);
+  --hr-red:    #b84233;
+  --hr-dim:    rgba(28,26,22,0.50);
+  --hr-faint:  rgba(28,26,22,0.28);
+
+  /* Games — Sumi/cyberpunk dark */
+  --gm-bg:     #0a0a12;
+  --gm-bg2:    #0f0f1a;
+  --gm-ink:    #d4d0c8;
+  --gm-rule:   rgba(255,255,255,0.07);
+  --gm-rule2:  rgba(255,255,255,0.14);
+  --gm-cyan:   #4ecdc4;
+  --gm-amber:  #f5a623;
+  --gm-pink:   #e8537a;
+  --gm-lav:    #9b8ec4;
+  --gm-green:  #5aad7a;
+  --gm-dim:    rgba(212,208,200,0.58);
+  --gm-faint:  rgba(212,208,200,0.28);
+}
+
+body {
+  font-size:17px; line-height:1.6; overflow-x:hidden;
+  transition: background 0.45s, color 0.45s;
+}
+body.mode-hr    { background:var(--hr-bg); color:var(--hr-ink); font-family:var(--serif-en); }
+body.mode-games { background:var(--gm-bg); color:var(--gm-ink); font-family:var(--serif-jp); }
+
+/* grain */
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+
+/* ── CHROME ── */
+#chrome {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:stretch; height:52px;
+  transition: background 0.45s, border-color 0.45s;
+}
+body.mode-hr    #chrome { background:var(--hr-bg);  border-bottom:1px solid var(--hr-rule2); }
+body.mode-games #chrome { background:var(--gm-bg2); border-bottom:1px solid var(--gm-rule2); }
+
+.chrome-name {
+  display:flex; align-items:center; padding:0 28px;
+  font-family:var(--mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase;
+  white-space:nowrap; transition:color 0.45s, border-color 0.45s;
+}
+body.mode-hr    .chrome-name { color:var(--hr-dim);   border-right:1px solid var(--hr-rule2); }
+body.mode-games .chrome-name { color:var(--gm-faint); border-right:1px solid var(--gm-rule2); }
+.chrome-name strong { font-weight:400; transition:color 0.45s; }
+body.mode-hr    .chrome-name strong { color:var(--hr-ink); }
+body.mode-games .chrome-name strong { color:var(--gm-ink); }
+
+.tab-bar { display:flex; align-items:stretch; flex:1; padding:0 8px; }
+
+.tab {
+  display:flex; align-items:center; gap:9px;
+  padding:0 22px; cursor:pointer; border:none; background:transparent;
+  font-family:var(--mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase;
+  position:relative; transition:color 0.25s;
+}
+.tab::after {
+  content:''; position:absolute; bottom:0; left:14px; right:14px;
+  height:2px; background:transparent; transition:background 0.25s;
+}
+body.mode-hr    .tab { color:var(--hr-faint); }
+body.mode-games .tab { color:var(--gm-faint); }
+.tab-hr.active    { color:var(--hr-ink)  !important; }
+.tab-hr.active::after    { background:var(--hr-red); }
+.tab-games.active { color:var(--gm-cyan) !important; }
+.tab-games.active::after { background:var(--gm-cyan); }
+
+.chrome-kofi {
+  display:flex; align-items:center; gap:5px; padding:0 20px; margin-left:auto;
+  font-family:var(--mono); font-size:9px; letter-spacing:0.15em; text-transform:uppercase;
+  text-decoration:none; white-space:nowrap; transition:color 0.2s, border-color 0.45s;
+}
+body.mode-hr    .chrome-kofi { color:var(--hr-faint); border-left:1px solid var(--hr-rule2); }
+body.mode-games .chrome-kofi { color:var(--gm-faint); border-left:1px solid var(--gm-rule2); }
+body.mode-hr    .chrome-kofi:hover { color:var(--hr-red); }
+body.mode-games .chrome-kofi:hover { color:var(--gm-amber); }
+
+/* ── PANELS ── */
+.panel { display:none; padding-top:52px; min-height:100vh; }
+.panel.active { display:block; animation:panelIn 0.38s ease forwards; }
+@keyframes panelIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ═══════════════════════════════
+   HR PANEL
+═══════════════════════════════ */
+#panel-hr { background:var(--hr-bg); color:var(--hr-ink); font-family:var(--serif-en); }
+
+.hr-hero {
+  position:relative; overflow:hidden;
+  padding:72px 56px 64px;
+  border-bottom:1px solid var(--hr-rule2);
+}
+.hr-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:repeating-linear-gradient(
+    to bottom, transparent 0, transparent 31px, var(--hr-rule) 31px, var(--hr-rule) 32px
+  );
+}
+.hr-watermark {
+  position:absolute; right:-16px; bottom:-24px;
+  font-family:var(--serif-en); font-size:clamp(90px,13vw,190px);
+  font-weight:300; color:rgba(28,26,22,0.04);
+  line-height:1; pointer-events:none; user-select:none;
+}
+.hr-eyebrow {
+  font-family:var(--mono); font-size:9px; letter-spacing:0.35em;
+  text-transform:uppercase; color:var(--hr-red); margin-bottom:20px;
+}
+.hr-title {
+  font-family:var(--serif-en); font-size:clamp(38px,5.5vw,68px);
+  font-weight:300; line-height:1.1;
+}
+.hr-title em { font-style:italic; color:var(--hr-dim); }
+.hr-rule-line { width:56px; height:1px; background:var(--hr-rule2); margin:24px 0; }
+.hr-desc {
+  max-width:500px; font-size:18px; font-weight:300;
+  color:var(--hr-dim); line-height:1.85;
+}
+.hr-desc strong { color:var(--hr-ink); font-weight:400; }
+.hr-tags { display:flex; gap:10px; flex-wrap:wrap; margin-top:28px; }
+.hr-tag {
+  font-family:var(--mono); font-size:8px; letter-spacing:0.18em;
+  text-transform:uppercase; color:var(--hr-faint);
+  border:1px solid var(--hr-rule2); padding:4px 11px;
+}
+
+/* Live HR cards */
+.hr-card {
+  background:var(--hr-bg2); border:1px solid var(--hr-rule);
+  padding:32px 28px 24px;
+  display:flex; flex-direction:column; position:relative; overflow:hidden;
+  text-decoration:none; color:inherit;
+  transition:background 0.2s, transform 0.18s;
+}
+.hr-card:hover { background:var(--hr-bg3); transform:translateY(-2px); }
+.hr-card::after {
+  content:''; position:absolute; top:0; right:0;
+  border-style:solid; border-width:0 22px 22px 0;
+  border-color:transparent var(--hr-rule2) transparent transparent;
+  transition:border-color 0.2s;
+}
+.hr-card:hover::after { border-color:transparent var(--hr-red) transparent transparent; }
+.hr-card .ct    { font-family:var(--mono); font-size:7px; letter-spacing:0.22em; text-transform:uppercase; color:var(--hr-faint); margin-bottom:14px; }
+.hr-card .ctitle { font-family:var(--serif-en); font-size:21px; font-weight:400; line-height:1.25; margin-bottom:10px; }
+.hr-card .cdesc { font-family:var(--serif-en); font-size:14px; font-weight:300; color:var(--hr-dim); line-height:1.8; flex:1; margin-bottom:20px; }
+.hr-card .cdesc em { color:var(--hr-ink); font-style:italic; }
+.hr-card .cfoot { display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--hr-rule); }
+.hr-card .ctags { display:flex; gap:6px; flex-wrap:wrap; }
+.hr-card .ctag  { font-family:var(--mono); font-size:6px; letter-spacing:0.15em; text-transform:uppercase; color:var(--hr-faint); border:1px solid var(--hr-rule); padding:2px 7px; }
+.hr-card .ccta  { font-family:var(--mono); font-size:8px; letter-spacing:0.15em; text-transform:uppercase; color:var(--hr-red); white-space:nowrap; transition:letter-spacing 0.2s; }
+.hr-card:hover .ccta { letter-spacing:0.25em; }
+
+/* Coming soon section */
+.hr-coming {
+  padding:56px;
+}
+.hr-coming-label {
+  font-family:var(--mono); font-size:9px; letter-spacing:0.3em;
+  text-transform:uppercase; color:var(--hr-faint);
+  border-bottom:1px solid var(--hr-rule); padding-bottom:16px; margin-bottom:40px;
+}
+.hr-soon-grid {
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:2px;
+}
+.hr-soon-card {
+  background:var(--hr-bg2); border:1px solid var(--hr-rule);
+  padding:28px 24px;
+  position:relative; overflow:hidden;
+}
+/* diagonal hatch on coming-soon cards */
+.hr-soon-card::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px, transparent 8px,
+    rgba(28,26,22,0.025) 8px, rgba(28,26,22,0.025) 9px
+  );
+}
+.hr-soon-title {
+  font-family:var(--serif-en); font-size:18px; font-weight:400;
+  margin-bottom:8px; color:var(--hr-ink);
+}
+.hr-soon-type {
+  font-family:var(--mono); font-size:7px; letter-spacing:0.2em;
+  text-transform:uppercase; color:var(--hr-faint); margin-bottom:12px;
+}
+.hr-soon-desc {
+  font-family:var(--serif-en); font-size:13px; font-weight:300;
+  color:var(--hr-faint); line-height:1.75;
+}
+.hr-soon-badge {
+  display:inline-block; margin-top:16px;
+  font-family:var(--mono); font-size:7px; letter-spacing:0.2em;
+  text-transform:uppercase; color:var(--hr-red);
+  border:1px solid rgba(184,66,51,0.3); padding:3px 9px;
+}
+
+.hr-footer {
+  background:var(--hr-ink); padding:36px 56px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+}
+.hr-footer-name { font-family:var(--serif-en); font-size:19px; font-weight:300; color:var(--hr-bg); }
+.hr-footer-links { display:flex; gap:20px; }
+.hr-footer-links a {
+  font-family:var(--mono); font-size:8px; letter-spacing:0.2em; text-transform:uppercase;
+  color:rgba(244,239,228,0.32); text-decoration:none; transition:color 0.2s;
+}
+.hr-footer-links a:hover { color:var(--hr-bg); }
+
+/* ═══════════════════════════════
+   GAMES PANEL
+═══════════════════════════════ */
+#panel-games { background:var(--gm-bg); color:var(--gm-ink); font-family:var(--serif-jp); }
+
+#panel-games::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(78,205,196,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 35% at 90% 90%, rgba(155,142,196,0.06) 0%, transparent 60%);
+}
+
+.gm-hero {
+  position:relative; z-index:1;
+  padding:72px 56px 64px;
+  border-bottom:1px solid var(--gm-rule2);
+}
+.gm-eyebrow {
+  font-family:var(--mono); font-size:9px; letter-spacing:0.35em;
+  text-transform:uppercase; color:var(--gm-faint); margin-bottom:20px;
+}
+.gm-title {
+  font-family:var(--serif-jp); font-size:clamp(34px,5vw,62px);
+  font-weight:300; line-height:1.25; color:var(--gm-ink);
+}
+.gm-title em { color:var(--gm-cyan); font-style:normal; }
+.gm-kanji {
+  font-family:var(--serif-jp); font-size:clamp(13px,1.8vw,17px);
+  font-weight:300; color:var(--gm-faint); letter-spacing:0.1em; margin-top:6px; margin-bottom:4px;
+}
+.gm-rule-line { width:56px; height:1px; background:var(--gm-rule2); margin:24px 0; }
+.gm-desc {
+  max-width:500px; font-family:var(--serif-jp); font-size:14px; font-weight:300;
+  color:var(--gm-dim); line-height:2.1;
+}
+.gm-desc strong { color:var(--gm-ink); font-weight:400; }
+
+.gm-grid {
+  position:relative; z-index:1;
+  padding:52px 56px;
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:2px;
+}
+
+.gm-card {
+  background:rgba(15,15,26,0.9); border:1px solid var(--gm-rule);
+  padding:32px 28px 24px;
+  display:flex; flex-direction:column; position:relative; overflow:hidden;
+  text-decoration:none; color:inherit;
+  transition:border-color 0.2s, transform 0.18s, background 0.2s;
+}
+.gm-card:hover { transform:translateY(-2px); background:rgba(20,20,34,0.98); border-color:var(--gm-rule2); }
+
+/* per-card accent corners */
+.gm-card[data-c="cyan"]::after  { content:''; position:absolute; top:0; right:0; border-style:solid; border-width:0 20px 20px 0; border-color:transparent var(--gm-cyan)  transparent transparent; opacity:0.35; transition:opacity 0.2s; }
+.gm-card[data-c="amber"]::after { content:''; position:absolute; top:0; right:0; border-style:solid; border-width:0 20px 20px 0; border-color:transparent var(--gm-amber) transparent transparent; opacity:0.35; transition:opacity 0.2s; }
+.gm-card[data-c="pink"]::after  { content:''; position:absolute; top:0; right:0; border-style:solid; border-width:0 20px 20px 0; border-color:transparent var(--gm-pink)  transparent transparent; opacity:0.35; transition:opacity 0.2s; }
+.gm-card[data-c="lav"]::after   { content:''; position:absolute; top:0; right:0; border-style:solid; border-width:0 20px 20px 0; border-color:transparent var(--gm-lav)   transparent transparent; opacity:0.35; transition:opacity 0.2s; }
+.gm-card[data-c="green"]::after { content:''; position:absolute; top:0; right:0; border-style:solid; border-width:0 20px 20px 0; border-color:transparent var(--gm-green) transparent transparent; opacity:0.35; transition:opacity 0.2s; }
+.gm-card:hover::after { opacity:1 !important; }
+
+/* featured card */
+.gm-card-feat {
+  grid-column:1/-1;
+  background:rgba(8,8,16,0.99); border-color:rgba(78,205,196,0.2); padding:44px;
+}
+.gm-card-feat:hover { border-color:rgba(78,205,196,0.5); }
+.gm-card-feat .gct   { color:var(--gm-faint); }
+.gm-card-feat .gctitle { font-size:clamp(22px,3vw,36px); color:var(--gm-ink); }
+.gm-card-feat .gcdesc  { font-size:14px; color:var(--gm-dim); }
+.gm-card-feat .gcfoot  { border-color:var(--gm-rule2); }
+.gm-card-feat .gccta   { color:var(--gm-cyan); }
+.gm-card-feat:hover .gccta { letter-spacing:0.25em; }
+
+.gct    { font-family:var(--mono); font-size:7px; letter-spacing:0.22em; text-transform:uppercase; color:var(--gm-faint); margin-bottom:14px; }
+.gctitle { font-family:var(--serif-jp); font-size:19px; font-weight:400; line-height:1.35; margin-bottom:10px; color:var(--gm-ink); }
+.gcdesc { font-family:var(--serif-jp); font-size:13px; font-weight:300; color:var(--gm-dim); line-height:2; flex:1; margin-bottom:20px; }
+.gcdesc em { font-style:italic; }
+.gcfoot { display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--gm-rule); }
+.gctags { display:flex; gap:6px; flex-wrap:wrap; }
+.gctag  { font-family:var(--mono); font-size:6px; letter-spacing:0.15em; text-transform:uppercase; color:var(--gm-faint); border:1px solid var(--gm-rule); padding:2px 7px; }
+.gccta  { font-family:var(--mono); font-size:8px; letter-spacing:0.15em; text-transform:uppercase; color:var(--gm-amber); white-space:nowrap; transition:letter-spacing 0.2s; }
+.gm-card:hover .gccta { letter-spacing:0.25em; }
+
+/* accent colors per card for cta */
+.gm-card[data-c="cyan"]  .gccta { color:var(--gm-cyan); }
+.gm-card[data-c="pink"]  .gccta { color:var(--gm-pink); }
+.gm-card[data-c="lav"]   .gccta { color:var(--gm-lav); }
+.gm-card[data-c="green"] .gccta { color:var(--gm-green); }
+
+.gm-footer {
+  position:relative; z-index:1;
+  background:rgba(5,5,10,0.98); padding:36px 56px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+  border-top:1px solid var(--gm-rule2);
+}
+.gm-footer-name { font-family:var(--serif-jp); font-size:17px; font-weight:300; color:var(--gm-dim); }
+.gm-footer-links { display:flex; gap:20px; }
+.gm-footer-links a {
+  font-family:var(--mono); font-size:8px; letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--gm-faint); text-decoration:none; transition:color 0.2s;
+}
+.gm-footer-links a:hover { color:var(--gm-cyan); }
+
+/* ── Scroll reveal ── */
+.reveal { opacity:0; transform:translateY(14px); transition:opacity 0.55s ease, transform 0.55s ease; }
+.reveal.vis { opacity:1; transform:translateY(0); }
+.reveal:nth-child(2){transition-delay:.07s}
+.reveal:nth-child(3){transition-delay:.14s}
+.reveal:nth-child(4){transition-delay:.21s}
+.reveal:nth-child(5){transition-delay:.28s}
+.reveal:nth-child(6){transition-delay:.35s}
+.reveal:nth-child(7){transition-delay:.42s}
+
+/* ── Responsive ── */
+@media(max-width:680px){
+  .hr-hero,.gm-hero { padding:40px 24px 48px; }
+  .hr-coming,.gm-grid { padding:24px; }
+  .hr-footer,.gm-footer { padding:28px 24px; }
+  .gm-card-feat { padding:28px 20px; }
+  .chrome-name { display:none; }
+  .tab { padding:0 14px; font-size:9px; }
+  .kofi-label { display:none; }
+}
+</style>
+</head>
+<body class="mode-hr">
+
+<!-- CHROME -->
+<div id="chrome">
+  <div class="chrome-name"><strong>Samir Saad</strong>&nbsp;/&nbsp;Interactive Work</div>
+  <div class="tab-bar">
+    <button class="tab tab-hr active" onclick="switchTab('hr')">📋&nbsp; HR Tools</button>
+    <button class="tab tab-games" onclick="switchTab('games')">🎮&nbsp; Games</button>
+  </div>
+  <a class="chrome-kofi" href="https://ko-fi.com/samirhr" target="_blank">☕<span class="kofi-label">&nbsp;Ko-fi</span></a>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     HR PANEL
+═══════════════════════════════════════ -->
+<div class="panel active" id="panel-hr">
+
+  <div class="hr-hero">
+    <div class="hr-watermark">practice</div>
+    <div class="hr-eyebrow">HR · Organizational Behavior · Interactive Tools</div>
+    <h1 class="hr-title">Thinking tools<br><em>for practitioners.</em></h1>
+    <div class="hr-rule-line"></div>
+    <p class="hr-desc">
+      <strong>HR Business Partner. SPHR.</strong> A simulation can demonstrate what a slide deck cannot — if it's honest about complexity and makes the player feel the weight of the decision.
+    </p>
+    <div class="hr-tags">
+      <span class="hr-tag">HR Business Partner II · Paychex</span>
+      <span class="hr-tag">SPHR Certified</span>
+      <span class="hr-tag">MS · HRD / Org Design</span>
+      <span class="hr-tag">Rochester, NY</span>
+    </div>
+  </div>
+
+  <div class="hr-coming">
+    <div class="hr-coming-label">Tools in development — launching soon</div>
+    <div class="hr-soon-grid">
+
+      <a class="hr-card reveal" href="https://samirsaad786.github.io/the-hire-wire" target="_blank">
+        <div class="ct">Leadership Simulation</div>
+        <div class="ctitle">The Hire Wire</div>
+        <div class="cdesc">A $500K budget, an open org chart, and five hires to make. Your choices — and what they reveal about you — unfold over nine simulated months. <em>Who you pick says everything.</em></div>
+        <div class="cfoot">
+          <div class="ctags"><span class="ctag">Leadership</span><span class="ctag">Hiring Judgment</span><span class="ctag">Values</span></div>
+          <span class="ccta">Play →</span>
+        </div>
+      </a>
+
+      <a class="hr-card reveal" href="https://samirsaad786.github.io/behavior-gap-game/" target="_blank">
+        <div class="ct">Org Behavior · Systems Thinking</div>
+        <div class="ctitle">The Behavior Gap</div>
+        <div class="cdesc">Why training rarely changes behavior. What incentives, friction, and risk allocation <em>actually</em> drive what people do in organizations.</div>
+        <div class="cfoot">
+          <div class="ctags"><span class="ctag">L&amp;D</span><span class="ctag">Behavior Change</span><span class="ctag">Systems</span></div>
+          <span class="ccta">Play →</span>
+        </div>
+      </a>
+
+      <a class="hr-card reveal" href="https://samirsaad786.github.io/Team-Dynamics/" target="_blank">
+        <div class="ct">Team Design · Belbin-Informed</div>
+        <div class="ctitle">Team Dynamics Puzzle</div>
+        <div class="cdesc">Role balance is necessary, not sufficient. An interactive exploration of team composition with Belbin's limitations built honestly into the simulation.</div>
+        <div class="cfoot">
+          <div class="ctags"><span class="ctag">Team Design</span><span class="ctag">Org Design</span><span class="ctag">Belbin</span></div>
+          <span class="ccta">Play →</span>
+        </div>
+      </a>
+
+      <a class="hr-card reveal" href="https://samirsaad786.github.io/hr-sanity-check/" target="_blank">
+        <div class="ct">Self-Assessment · Manager Coaching</div>
+        <div class="ctitle">HR Sanity Check</div>
+        <div class="cdesc">A quick diagnostic for HR practitioners and managers. Are you solving the right problems, or just staying busy? <em>Sometimes the most useful thing is an honest mirror.</em></div>
+        <div class="cfoot">
+          <div class="ctags"><span class="ctag">Self-Assessment</span><span class="ctag">HRBP</span><span class="ctag">Diagnostics</span></div>
+          <span class="ccta">Play →</span>
+        </div>
+      </a>
+
+      <div class="hr-soon-card reveal">
+        <div class="hr-soon-type">Resource Allocation · Strategy</div>
+        <div class="hr-soon-title">HRBP Strategy Simulator</div>
+        <div class="hr-soon-desc">Twelve weeks. Finite resources. Competing priorities. The embedded HRBP's real constraint: you cannot do everything. So what do you actually choose?</div>
+        <span class="hr-soon-badge">Coming Soon</span>
+      </div>
+
+      <div class="hr-soon-card reveal">
+        <div class="hr-soon-type">M&amp;A · Change Management</div>
+        <div class="hr-soon-title">M&amp;A Leadership Simulator</div>
+        <div class="hr-soon-desc">Navigate the human side of a merger — integration decisions, cultural friction, communication timing. The spreadsheet doesn't capture this part.</div>
+        <span class="hr-soon-badge">Coming Soon</span>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="hr-footer">
+    <div class="hr-footer-name">Samir Saad</div>
+    <div class="hr-footer-links">
+      <a href="https://linkedin.com/in/samirsaad" target="_blank">LinkedIn ↗</a>
+      <a href="https://github.com/SamirSaad786" target="_blank">GitHub ↗</a>
+      <a href="https://ko-fi.com/samirhr" target="_blank">☕ Ko-fi ↗</a>
+    </div>
+  </footer>
+
+</div><!-- /panel-hr -->
+
+
+<!-- ═══════════════════════════════════════
+     GAMES PANEL
+═══════════════════════════════════════ -->
+<div class="panel" id="panel-games">
+
+  <div class="gm-hero">
+    <div class="gm-eyebrow">Puzzle · Narrative · Arcade · Idle · Browser Games</div>
+    <h1 class="gm-title">Browser games.<br><em>Play in seconds.</em></h1>
+    <div class="gm-kanji">ブラウザゲーム &nbsp;·&nbsp; インストール不要</div>
+    <div class="gm-rule-line"></div>
+    <p class="gm-desc">
+      <strong>Single-file HTML5.</strong> No install. No account. No friction. Click and play. Built with Web Audio, hand-written narrative, and procedural systems.
+    </p>
+  </div>
+
+  <div class="gm-grid">
+
+    <!-- SUMI'S JOURNAL — featured -->
+    <a class="gm-card gm-card-feat reveal" data-c="cyan" href="https://samirsaad786.github.io/sumis_journal/" target="_blank">
+      <div class="gct">Featured · Puzzle / Narrative · Web Audio</div>
+      <div class="gctitle">Sumi's Journal &nbsp;<span style="opacity:0.35;font-size:0.62em;">墨の日誌</span></div>
+      <div class="gcdesc">A contemplative signal-routing puzzle set in the decaying cyberpunk city of Yōsei-to. You are Sumi — last relay keeper — routing signals ward by ward before they decay to zero, reading her journal as the city slowly finds its voice again. Roguelike upgrade runs, procedural gamelan ambient music, six wards of increasing complexity. <em>More Monument Valley than action game.</em></div>
+      <div class="gcfoot">
+        <div class="gctags"><span class="gctag">Puzzle</span><span class="gctag">Narrative</span><span class="gctag">Web Audio</span><span class="gctag">Roguelike Elements</span><span class="gctag">Mobile</span></div>
+        <span class="gccta">Play →</span>
+      </div>
+    </a>
+
+    <!-- NULLZONE -->
+    <a class="gm-card reveal" data-c="pink" href="https://samirsaad786.github.io/nullzone/" target="_blank">
+      <div class="gct">Block Puzzle · Cyberpunk</div>
+      <div class="gctitle">NULLZONE</div>
+      <div class="gcdesc">Tetris meets 1010! inside a hacking narrative. Fill rows and columns on an 8×8 grid to breach encrypted data sectors — while corruption, row locks, and surges fire as you go deeper. Six sector themes shift the palette from residential cyan to stark void. <em>A meditative tension loop that turns a casual puzzler into something darker.</em></div>
+      <div class="gcfoot">
+        <div class="gctags"><span class="gctag">Puzzle</span><span class="gctag">Cyberpunk</span><span class="gctag">Leaderboard</span><span class="gctag">Daily Mode</span></div>
+        <span class="gccta">Play →</span>
+      </div>
+    </a>
+
+    <!-- SUNLIT HOLLOW -->
+    <a class="gm-card reveal" data-c="green" href="https://samirsaad786.github.io/SunlitHollow/" target="_blank">
+      <div class="gct">Idle / Clicker · Forest Fantasy</div>
+      <div class="gctitle">Sunlit Hollow</div>
+      <div class="gcdesc">You are the Warden of a mystical forest that exists between worlds. Tap sunlight, grow eight tiers of forest from seedlings to aurora — fireflies drift, a brook babbles when you unlock it, birdsong builds procedurally. Rebirth resets progress for permanent Moonbeam bonuses. <em>More A Short Hike than Cookie Clicker in tone.</em></div>
+      <div class="gcfoot">
+        <div class="gctags"><span class="gctag">Idle</span><span class="gctag">Cozy</span><span class="gctag">Web Audio</span><span class="gctag">Rebirth System</span></div>
+        <span class="gccta">Play →</span>
+      </div>
+    </a>
+
+    <!-- MIRROR POOL -->
+    <a class="gm-card reveal" data-c="lav" href="https://samirsaad786.github.io/mirror-pool/" target="_blank">
+      <div class="gct">Puzzle · Japanese Folklore</div>
+      <div class="gctitle">The Mirror Pool</div>
+      <div class="gcdesc">A kitsune tile-swap puzzle with dual-world mechanics — what you see in this world and its reflection are not the same. Nine-tails progression, a favor/curse system, seven environmental themes. <em>The world beneath it is the one that matters.</em></div>
+      <div class="gcfoot">
+        <div class="gctags"><span class="gctag">Puzzle</span><span class="gctag">Kitsune</span><span class="gctag">Folklore</span><span class="gctag">Dual World</span></div>
+        <span class="gccta">Play →</span>
+      </div>
+    </a>
+
+    <!-- UFO RAIDER -->
+    <a class="gm-card reveal" data-c="amber" href="https://samirsaad786.github.io/ufo-raider/" target="_blank">
+      <div class="gct">Arcade · Side-Scroller · Synthwave</div>
+      <div class="gctitle">UFO Raider</div>
+      <div class="gcdesc">2157. You're an agent of the Galactic Harvest Bureau flying a Class-9 Extractor on a human abduction run. Five hostile sectors, parallax scrolling environments, a GTA-style wanted level that ramps the military response, combo multipliers up to ×8. <em>The more you take, the harder they come for you.</em></div>
+      <div class="gcfoot">
+        <div class="gctags"><span class="gctag">Arcade</span><span class="gctag">Synthwave</span><span class="gctag">Leaderboard</span><span class="gctag">5 Sectors</span></div>
+        <span class="gccta">Play →</span>
+      </div>
+    </a>
+
+  </div>
+
+  <footer class="gm-footer">
+    <div class="gm-footer-name">Samir Saad · Interactive Work</div>
+    <div class="gm-footer-links">
+      <a href="https://linkedin.com/in/samirsaad" target="_blank">LinkedIn ↗</a>
+      <a href="https://github.com/SamirSaad786" target="_blank">GitHub ↗</a>
+      <a href="https://ko-fi.com/samirhr" target="_blank">☕ Ko-fi ↗</a>
+    </div>
+  </footer>
+
+</div><!-- /panel-games -->
+
+
+<script>
+function switchTab(tab) {
+  const toHr = tab === 'hr';
+  document.getElementById('panel-hr').classList.toggle('active', toHr);
+  document.getElementById('panel-games').classList.toggle('active', !toHr);
+  document.body.className = toHr ? 'mode-hr' : 'mode-games';
+  document.querySelector('.tab-hr').classList.toggle('active', toHr);
+  document.querySelector('.tab-games').classList.toggle('active', !toHr);
+  window.scrollTo({top:0, behavior:'smooth'});
+  setTimeout(watchReveals, 60);
+}
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); }});
+}, { threshold:0.08 });
+
+function watchReveals() {
+  document.querySelectorAll('.panel.active .reveal:not(.vis)').forEach(el => io.observe(el));
+}
+watchReveals();
+</script>
+</body>
+</html>
