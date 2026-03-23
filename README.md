@@ -4,7 +4,7 @@
 
 This is the source for my personal portfolio site — a collection of interactive HR simulations and browser games, all built as single-file HTML5 with no backend, no install, and no friction.
 
-🔗 [Visit the site](https://samirsaad786.github.io/)
+🔗 [Visit the site](https://samirsaad786.github.io/) 
 
 ---
 
