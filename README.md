@@ -24,6 +24,7 @@ Interactive tools built for HR practitioners, people leaders, and organizational
 | [M&A Leadership Simulator](https://samirsaad786.github.io/mergers-acquisitions/) | Navigate integration decisions, cultural friction, and communication timing post-merger |
 | [TrueRecord](https://samirsaad786.github.io/truerecord/) | Privacy-first grievance reporting portal with cryptographic audit chain — no server, no backend |
 | [Pattern Intel](https://samirsaad786.github.io/termination-scanner/) | Six-agent AI scanner that reads your termination records for legal risk patterns. The pattern was always there. Someone just had to be looking. |
+| [The Village Well](https://samirsaad786.github.io/village-well/) | A playable parable about the capability trap — why orgs reward firefighters and never fund the work that stops the fires. Play the round, then read the ledger. You can't celebrate an absence. |
 
 ### 🎮 Browser Games
 
